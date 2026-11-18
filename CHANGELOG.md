@@ -6,4 +6,5 @@ Breaking changes are listed first in each entry.
 
 - First release of this template: drawDB 1.9.0 from `ghcr.io/drawdb-io/drawdb:v1.9.0@sha256:8239ebdde4e23b35da2e68fc6ea158bffb6e59dad09abc7d1b1234d66ce6fbd4`.
 - nginx listens on Railway's `PORT` (default 8080) and answers `/healthz` for the health check.
+- `/_vercel/*` answers an empty script: the upstream build loads Vercel Analytics, which on a non-Vercel host got `index.html` back and threw "Unexpected token '<'" in the browser. No analytics are sent.
 - Optional `VITE_BACKEND_URL` / `VITE_GIST_BACKEND_URL` for a drawdb-server (sharing), read at container start.
