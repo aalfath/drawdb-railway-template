@@ -1,0 +1,34 @@
+server {
+    listen ${PORT};
+    server_name _;
+    root /usr/share/nginx/html;
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # Health check for Railway (no login, no app state).
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # Runtime config read by the app (same as the upstream image).
+    location = /config.js {
+        default_type application/javascript;
+        add_header Cache-Control "no-store";
+        return 200 "window.__DRAWDB_CONFIG__ = { backendUrl: \"${VITE_BACKEND_URL}\", gistBackendUrl: \"${VITE_GIST_BACKEND_URL}\" };";
+    }
+
+    # Vite build output has content-hashed file names.
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        try_files $uri =404;
+    }
+
+    # Single-page app: every other path serves index.html.
+    location / {
+        try_files $uri /index.html;
+    }
+}
